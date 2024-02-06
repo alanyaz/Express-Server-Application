@@ -1,0 +1,161 @@
+<!-- views/users.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+		<link rel="stylesheet" href="styles.css">
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .user-form {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+		<!-- Navigation Menu -->
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-moment">Add Moment</a></li>
+                <li><a href="/my-arts">My Arts</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </nav>
+    </header>
+		
+    <h1>User Management</h1>
+
+    <!-- User Creation Form -->
+    <div class="user-form">
+        <h2>Create a new user</h2>
+        <form action="/users" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <button type="submit">Create User</button>
+        </form>
+    </div>
+
+    <!-- User List -->
+    <h2>User List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(user => { %>
+                <tr id="userRow<%= user.id %>">
+                    <td><%= user.id %></td>
+                    <td><%= user.name %></td>
+                    <td>
+												<a href="#" onclick="editUser(<%= user.id %>, '<%= user.name %>')">Edit</a> |
+												<a href="#" onclick="deleteUser(<%= user.id %>)">Delete</a>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+		<!-- Edit User Modal -->
+		<div id="editUserModal" class="modal">
+				<div class="modal-content">
+						<span class="close" onclick="closeEditModal()">&times;</span>
+						<h2>Edit User</h2>
+						<form id="editUserForm">
+								<label for="editUserName">Name:</label>
+								<input type="text" id="editUserName" name="editUserName" required>
+								<input type="hidden" id="editUserId" name="editUserId">
+								<button type="button" onclick="updateUser()">Update User</button>
+						</form>
+				</div>
+		</div>
+
+	
+		<!-- Include JavaScript for handling edit and delete actions -->
+		<script>
+				
+				
+				function editUser(id, name) {
+						// Populate the edit form with user details
+						document.getElementById('editUserId').value = id;
+						document.getElementById('editUserName').value = name;
+
+						// Display the edit modal
+						document.getElementById('editUserModal').style.display = 'block';
+				}
+
+				function closeEditModal() {
+						// Close the edit modal
+						document.getElementById('editUserModal').style.display = 'none';
+				}
+
+				function updateUser() {
+						const id = document.getElementById('editUserId').value;
+						const updatedName = document.getElementById('editUserName').value;
+
+						// Make sure the field name is 'name'
+						fetch(`/users/${id}`, {
+								method: 'PUT',
+								headers: {
+										'Content-Type': 'application/json',
+								},
+								body: JSON.stringify({ name: updatedName }), // Use the correct field name
+						})
+						.then(response => response.json())
+						.then(updatedUser => {
+								console.log('User updated:', updatedUser);
+								closeEditModal();
+								location.reload();
+						})
+						.catch(error => console.error('Error updating user:', error));
+				}
+				
+				
+				function deleteUser(id) {
+						fetch(`/users/${id}`, { method: 'DELETE' })
+						    .then(response => response.json())
+						    .then(data => {
+						        console.log(data);
+						        document.getElementById(`userRow${id}`).remove();
+						    })
+						    .catch(error => console.error(error));						
+				}
+		</script>
+</body>
+</html>
