@@ -59,7 +59,4 @@ This project is a small Node.js and Express application that implements a RESTfu
 2. Use the provided views to interact with the RESTful API.
 3. Explore the API endpoints using tools like Postman or cURL.
 
-## Contributing
-
-Contributions are welcome! If you have ideas for improvements or new features, feel free to open an issue or submit a pull request.
 
